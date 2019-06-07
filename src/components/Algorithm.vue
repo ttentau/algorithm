@@ -69,18 +69,19 @@
                 this.startTime = Date.now()
                 this.endTime = Date.now()
                 this.isRunSort = true
+                let newArr = JSON.parse(JSON.stringify(this.list))
                 switch (type) {
                     case 'Bubble':
-                        await this.bubbleSort(JSON.parse(JSON.stringify(this.list)))
+                        await this.bubbleSort(newArr)
                         break
                     case 'Selection':
-                        await this.selectionSort(JSON.parse(JSON.stringify(this.list)))
+                        await this.selectionSort(newArr)
                         break
                     case 'Insertion':
-                        await this.insertionSort(JSON.parse(JSON.stringify(this.list)))
+                        await this.insertionSort(newArr)
                         break
                     case 'Shell':
-                        await this.shellSort(JSON.parse(JSON.stringify(this.list)))
+                        await this.shellSort(newArr)
                         break
 
                 }
@@ -93,7 +94,24 @@
                 }
                 this.list = JSON.parse(JSON.stringify(list))
             },
-
+            //冒泡排序
+            async bubbleSort(list) {
+                let length = list.length
+                for (let i = 0; i < length - 1; i++) {
+                    for (let j = 0; j < length - 1 - i; j++) {
+                        list.map(v => v.isChange = false)
+                        if (list[j].value > list[j + 1].value) {
+                            if (!this.isRunSort) break
+                            let temp = list[j]
+                            list[j] = list[j + 1]
+                            list[j + 1] = temp
+                            list[j].isChange = true
+                            list[j + 1].isChange = true
+                            await this.updateView(list)
+                        }
+                    }
+                }
+            },
             //希尔排序
             async shellSort(arr) {
                 let len = arr.length
@@ -112,26 +130,6 @@
                 }
 
             },
-            //冒泡排序
-            async bubbleSort(list) {
-                let newArr = list
-                let length = newArr.length
-                for (let i = 0; i < length - 1; i++) {
-                    for (let j = 0; j < length - 1 - i; j++) {
-                        newArr.map(v => v.isChange = false)
-                        if (newArr[j].value > newArr[j + 1].value) {
-                            if (!this.isRunSort) break
-                            let temp = newArr[j]
-                            newArr[j] = newArr[j + 1]
-                            newArr[j + 1] = temp
-                            newArr[j].isChange = true
-                            newArr[j + 1].isChange = true
-                            await this.updateView(newArr)
-                        }
-                    }
-                }
-            },
-
             //选择排序
             async selectionSort(arr) {
                 let len = arr.length
