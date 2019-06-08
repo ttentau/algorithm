@@ -20,7 +20,8 @@
             </div>
 
             <ul>
-                <li v-for="(item,index) of list" :key="index" :style="{height:50+(item.value*10)+'px',background: item.isChange? '#1afff9':item.color}">
+                <li v-for="(item,index) of list" :key="index"
+                    :style="{height:50+(item.value*5)+'px',background: item.isChange? '#1afff9':item.color}">
                     {{item.value}}
                 </li>
             </ul>
@@ -31,6 +32,8 @@
                 <button @click="startSort('Selection')">Selection</button>
                 <button @click="startSort('Insertion')">Insertion</button>
                 <button @click="startSort('Shell')">Shell</button>
+                <button @click="startSort('Array')">Array</button>
+                <button @click="test()">Test</button>
             </div>
         </div>
     </div>
@@ -54,7 +57,7 @@
             }
         },
         watch: {
-            'columnAmount'(newVal, oldVal) {
+            columnAmount(newVal) {
                 if (newVal > 100) {
                     this.columnAmount = 100
                 }
@@ -65,6 +68,8 @@
         },
         computed: {},
         methods: {
+            test() {
+            },
             async startSort(type) {
                 this.startTime = Date.now()
                 this.endTime = Date.now()
@@ -83,6 +88,9 @@
                     case 'Shell':
                         await this.shellSort(newArr)
                         break
+                    case 'Array':
+                        await this.arraySort(newArr)
+                        break
 
                 }
                 this.endTime = Date.now()
@@ -92,16 +100,17 @@
                 if (parseInt(this.speed) !== 0) {
                     await this.sleep(this.speed)
                 }
-                this.list = JSON.parse(JSON.stringify(list))
+                // this.list = JSON.parse(JSON.stringify(list))
+                this.list = list
             },
             //冒泡排序
             async bubbleSort(list) {
-                let length = list.length
-                for (let i = 0; i < length - 1; i++) {
-                    for (let j = 0; j < length - 1 - i; j++) {
+                for (let i = 0; i < list.length - 1; i++) {
+                    for (let j = 0; j < list.length - 1 - i; j++) {
                         list.map(v => v.isChange = false)
+                        this.endTime = Date.now()
+                        if (!this.isRunSort) break
                         if (list[j].value > list[j + 1].value) {
-                            if (!this.isRunSort) break
                             let temp = list[j]
                             list[j] = list[j + 1]
                             list[j + 1] = temp
@@ -111,6 +120,7 @@
                         }
                     }
                 }
+                // console.log(list)
             },
             //希尔排序
             async shellSort(arr) {
@@ -131,20 +141,23 @@
 
             },
             //选择排序
-            async selectionSort(arr) {
-                let len = arr.length
+            async selectionSort(list) {
+                let len = list.length
                 let minIndex, temp
                 for (let i = 0; i < len - 1; i++) {
+                    this.endTime = Date.now()
                     minIndex = i
                     for (let j = i + 1; j < len; j++) {
-                        if (arr[j].value < arr[minIndex].value) {     // 寻找最小的数
-                            minIndex = j                 // 将最小数的索引保存
+                        if (!this.isRunSort) break
+                        if (list[j].value < list[minIndex].value) {     // 寻找最小的数
+                            minIndex = j// 将最小数的索引保存
                         }
                     }
-                    temp = arr[i]
-                    arr[i] = arr[minIndex]
-                    arr[minIndex] = temp
-                    await this.updateView(arr)
+                    temp = list[i]
+                    list[i] = list[minIndex]
+                    list[minIndex] = temp
+                    await this.updateView(list)
+
                 }
             },
 
@@ -163,6 +176,13 @@
                     await this.updateView(arr)
                 }
             },
+            //数组的原生排序
+            async arraySort(list) {
+                list.sort((a, b) => {
+                    return a.value - b.value
+                })
+                await this.updateView(list)
+            },
             sleep(time) {
                 return new Promise(resolve => {
                     setTimeout(() => {
@@ -174,18 +194,20 @@
                 if (this.isRunSort) return this.isRunSort = false
                 let list = this.gradient(this.startColor, this.endColor, this.columnAmount)
 
-                let length = list.length
-                let newArr = []
-                let newIndexArr = []
-                for (let i = 0; i < length; i++) {
-                    let newIndex = this.getRandomInt(length)
-                    while (newIndexArr.indexOf(newIndex) !== -1) {
-                        newIndex = this.getRandomInt(length)
-                    }
-                    newIndexArr.push(newIndex)
-                    newArr.push(list[newIndex])
-                }
-                this.list = newArr
+                // let length = list.length
+                // let newArr = []
+                // let newIndexArr = []
+                // for (let i = 0; i < length; i++) {
+                //     let newIndex = this.getRandomInt(length)
+                //     while (newIndexArr.indexOf(newIndex) !== -1) {
+                //         newIndex = this.getRandomInt(length)
+                //     }
+                //     newIndexArr.push(newIndex)
+                //     newArr.push(list[newIndex])
+                // }
+                // this.list = newArr
+                list.sort(() => Math.random() - Math.random())
+                this.list = list
             },
             getRandomInt(max) {
                 return Math.floor(Math.random() * Math.floor(max))
@@ -282,7 +304,7 @@
 
                 li {
                     border-radius: 10px 10px 0 0;
-                    margin: 0 3px;
+                    /*margin: 0 3px;*/
                     width: 25px;
                     display: flex;
                     justify-content: center;
